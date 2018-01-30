@@ -1,0 +1,9 @@
+#!/bin/sh
+wr=$1
+cmd=$2
+cat > $wr <<END
+#!/bin/sh
+UNAME=.; export UNAME
+exec $cmd "\$@"
+END
+chmod 755 $wr

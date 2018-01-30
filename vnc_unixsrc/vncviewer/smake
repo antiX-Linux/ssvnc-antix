@@ -1,0 +1,11 @@
+#!/bin/sh
+
+PATH=`pwd`/../..:/usr/sfw/bin:/usr/ccs/bin:$PATH
+export PATH
+if [ "X$1" != "X" ]; then
+	"$@"
+else
+	make
+	strip vncviewer
+	ls -l vncviewer
+fi

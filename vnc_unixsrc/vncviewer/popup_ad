@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+$ok = 0;
+
+open(A, "<argsresources.c") || die;
+
+while (<A>) {
+	if (/popupButtonCount:/) {
+		$on = 1;
+	} elsif (/^\s*NULL/) {
+		$on = 0;
+	}
+	next unless $on;
+	chomp;
+	last if /NULL/;
+	$_ =~ s/^\s*"//;
+	$_ =~ s/",//;
+	$_ .= "\n" unless $_ =~ /\n/;
+	print;
+}

@@ -1,0 +1,33 @@
+Source: ssvnc
+Section: net
+Priority: extra
+Maintainer: Magnus Holmgren <holmgren@debian.org>
+Build-Depends: dpkg-dev (>= 1.15.7), debhelper (>= 7), xutils-dev, libxaw7-dev,
+ libxmu-dev, libxext-dev, libxt-dev, libsm-dev, libice-dev,
+ libjpeg-dev, zlib1g-dev | libz-dev,
+ default-jdk, libssl-dev, dh-strip-nondeterminism
+Standards-Version: 3.9.8
+Homepage: http://www.karlrunge.com/x11vnc/ssvnc.html
+
+Package: ssvnc
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, tk,
+ openssh-client, bind9-host | host, procps, psmisc, x-terminal-emulator,
+ stunnel4, openssl
+Recommends: default-jre | java5-runtime
+Description: Enhanced TightVNC viewer with SSL/SSH tunnel helper
+ VNC stands for Virtual Network Computing. It is, in essence, a remote
+ display system which allows you to view a computing `desktop'
+ environment not only on the machine where it is running, but from
+ anywhere on the Internet and from a wide variety of machine
+ architectures.
+ .
+ SSVNC is two things:
+ .
+ * An enhanced version of the TightVNC client with support for more
+ encodings and color modes, support for x11vnc and UltraVNC
+ extensions, dynamic screen resizing, an improved popup menu, etc.
+ .
+ * A GUI that helps set up an SSL (using stunnel) or SSH tunnel to
+ connect to the VNC server through, as well as forwarding of ports for
+ audio (esound/aRts), SMB, CUPS etc.

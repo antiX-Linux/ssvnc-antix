@@ -1,0 +1,44 @@
+Author: Magnus Holmgren <holmgren@debian.org>
+Description: Use hardcoded (and correct for the Debian package) path to ultraftp.jar
+ if SSVNC_ULTRA_FTP_JAR is unset.
+
+--- a/vnc_unixsrc/vncviewer/argsresources.c
++++ b/vnc_unixsrc/vncviewer/argsresources.c
+@@ -1702,35 +1702,8 @@ GetArgsAndResources(int argc, char **arg
+ 		appData.useBGR233 = 0;
+ 	}
+ 
+-	if (getenv("SSVNC_ULTRA_FTP_JAR") == NULL && programName != NULL) {
+-		int len = strlen(programName) + 200;
+-		char *q, *jar = (char *) malloc(len);
+-		
+-		sprintf(jar, "%s", programName);
+-		q = strrchr(jar, '/');
+-		if (q) {
+-			struct stat sb;
+-			*(q+1) = '\0';
+-			strcat(jar, "../lib/ssvnc/util/ultraftp.jar");
+-			if (stat(jar, &sb) == 0) {
+-				char *put = (char *) malloc(len);
+-				sprintf(put, "SSVNC_ULTRA_FTP_JAR=%s", jar);
+-				fprintf(stderr, "Setting: %s\n\n", put);
+-				putenv(put);
+-			} else {
+-				sprintf(jar, "%s", programName);
+-				q = strrchr(jar, '/');
+-				*(q+1) = '\0';
+-				strcat(jar, "util/ultraftp.jar");
+-				if (stat(jar, &sb) == 0) {
+-					char *put = (char *) malloc(len);
+-					sprintf(put, "SSVNC_ULTRA_FTP_JAR=%s", jar);
+-					fprintf(stderr, "Setting: %s\n\n", put);
+-					putenv(put);
+-				}
+-			}
+-		}
+-		free(jar);
++	if (getenv("SSVNC_ULTRA_FTP_JAR") == NULL) {
++	    putenv("SSVNC_ULTRA_FTP_JAR=/usr/lib/ssvnc/util/ultraftp.jar");
+ 	}
+ 
+ 

@@ -1,0 +1,30 @@
+Description: Don't strip ssvncviewer; let dh_strip handle that (or not, depending on build options)
+
+--- a/Makefile
++++ b/Makefile
+@@ -66,7 +66,6 @@ clean:
+ 
+ install: all
+ 	mkdir -p $(ROOT)$(PREFIX)/$(BIN) $(ROOT)$(PREFIX)/$(LIB) $(ROOT)$(PREFIX)/$(MANDIR)/man1
+-	strip $(VIEWER)
+ 	cp -p $(VIEWER) $(ROOT)$(PREFIX)/$(LIB)
+ 	cp -p $(VNCSPW) $(ROOT)$(PREFIX)/$(LIB)
+ 	cp -p $(UNWRAP) $(ROOT)$(PREFIX)/$(LIB)
+--- a/vncstorepw/Makefile
++++ b/vncstorepw/Makefile
+@@ -14,7 +14,6 @@ all: $(CMD) $(UNWRAP) $(LIMACC) $(ULTDSM
+ 
+ $(CMD): vncauth.o vncstorepw.o d3des.o
+ 	PATH=$$PATH:$(EPATH) $(CC) -o $(CMD) vncstorepw.o vncauth.o d3des.o
+-	PATH=$$PATH:$(EPATH) strip $(CMD)
+ 	@ls -l $(CMD)
+ 
+ $(UNWRAP): unwrap.c
+@@ -41,7 +40,6 @@ $(ULTDSM): ultravnc_dsm_helper.c
+ 	else \
+ 		PATH=$$PATH:$(EPATH) $(CC) -o $(ULTDSM) $(CPP_SSL) ultravnc_dsm_helper.c $(LD_SSL) -lssl -lcrypto; \
+ 	fi
+-	PATH=$$PATH:$(EPATH) strip $(ULTDSM)
+ 	@ls -l $(ULTDSM)
+ 
+ test: $(CMD)

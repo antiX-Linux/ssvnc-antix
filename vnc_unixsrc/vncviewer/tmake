@@ -1,0 +1,17 @@
+#!/bin/sh
+TURBOVNC_DIR=/home/runge/turbojpeg
+make clean
+(cd ../libvncauth || exit 1; make)
+if [ "X$1" = "X-a" ]; then
+	exit
+fi
+make CCOPTIONS=-DTURBOVNC EXTRA_LIBRARIES="-L$TURBOVNC_DIR -Xlinker --rpath=$TURBOVNC_DIR -Xlinker --rpath=/usr/local/lib -lturbojpeg"
+cp -p vncviewer vncviewer.turbovnc
+strip vncviewer.turbovnc
+ls -l vncviewer.turbovnc
+ldd   vncviewer.turbovnc
+
+echo
+make clean all
+ls -l vncviewer
+ldd   vncviewer

@@ -1,0 +1,96 @@
+Author: Magnus Holmgren <holmgren@debian.org>
+Description: Fix format-security warnings/errors
+ Replaces fprintf(stderr, str) with fputs(str, stderr) (where str in
+ most cases is argv[0]) and also one instance of sprintf (without
+ format string) with snprintf (with format string).
+
+--- a/vnc_unixsrc/vncviewer/sockets.c
++++ b/vnc_unixsrc/vncviewer/sockets.c
+@@ -482,7 +482,7 @@ fprintf(stderr, "R0: %06d\n", (int) dn);
+ 	    ProcessXtEvents();
+ 	    i = 0;
+ 	  } else {
+-	    fprintf(stderr,programName);
++	    fputs(programName,stderr);
+ 	    perror(": read");
+ 	    return False;
+ 	  }
+@@ -514,7 +514,7 @@ fprintf(stderr, "R1: %06d %06d %10.2f KB
+ 	    ProcessXtEvents();
+ 	    i = 0;
+ 	  } else {
+-	    fprintf(stderr,programName);
++	    fputs(programName,stderr);
+ 	    perror(": read");
+ 	    return False;
+ 	  }
+@@ -569,13 +569,13 @@ WriteExact(int sock, char *buf, int n)
+ 				FD_SET(rfbsock,&fds);
+ 
+ 				if (select(rfbsock+1, NULL, &fds, NULL, NULL) <= 0) {
+-					fprintf(stderr,programName);
++					fputs(programName,stderr);
+ 					perror(": select");
+ 					return False;
+ 				}
+ 				j = 0;
+ 			} else {
+-				fprintf(stderr,programName);
++				fputs(programName,stderr);
+ 				perror(": write");
+ 				return False;
+ 			}
+@@ -608,13 +608,13 @@ ConnectToUnixSocket(char *file) {
+ 
+ 	sock = socket(AF_UNIX, SOCK_STREAM, 0);
+ 	if (sock < 0) {
+-		fprintf(stderr,programName);
++		fputs(programName,stderr);
+ 		perror(": ConnectToUnixSocket: socket");
+ 		return -1;
+ 	}
+ 
+ 	if (connect(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+-		fprintf(stderr, programName);
++		fputs(programName,stderr);
+ 		perror(": ConnectToUnixSocket: connect");
+ 		close(sock);
+ 		return -1;
+@@ -880,7 +880,7 @@ FindFreeTcpPort(void)
+ 
+ 	sock = socket(AF_INET, SOCK_STREAM, 0);
+ 	if (sock < 0) {
+-		fprintf(stderr,programName);
++		fputs(programName,stderr);
+ 		perror(": FindFreeTcpPort: socket");
+ 		return 0;
+ 	}
+@@ -1084,7 +1084,7 @@ Bool
+ SetNonBlocking(int sock)
+ {
+   if (fcntl(sock, F_SETFL, O_NONBLOCK) < 0) {
+-    fprintf(stderr,programName);
++    fputs(programName,stderr);
+     perror(": AcceptTcpConnection: fcntl");
+     return False;
+   }
+--- a/vnc_unixsrc/vncviewer/vncviewer.c
++++ b/vnc_unixsrc/vncviewer/vncviewer.c
+@@ -130,7 +130,7 @@ void unixpw(char *instr, int vencrypt_pl
+ 			if (strlen(u) >= 100) {
+ 				exit(1);
+ 			}
+-			sprintf(username, u);
++			snprintf(username, sizeof(username), "%s", u);
+ 			p = DoPasswordDialog();
+ 		} else {
+ 			raiseme(1);
+@@ -1133,7 +1133,7 @@ void printChat(char *str, Bool raise) {
+ 		if (raise) {
+ 			raiseme(0);
+ 		}
+-		fprintf(stderr, str);
++		fputs(str, stderr);
+ 	} else {
+ 		if (raise) {
+ 			ShowChat(0, 0, 0, 0);

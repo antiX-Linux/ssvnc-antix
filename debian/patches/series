@@ -1,0 +1,9 @@
+confusing_-h.patch
+ultraftp_path.patch
+nostrip.patch
+buildflags.patch
+format-security.patch
+openssl1.1.patch
+auto-scale.patch
+samemachine_ip6_overflow.patch
+no_xterm

@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+open(HELP, "./vncviewer -h 2>&1|");
+$on = 0;
+while (<HELP>) {
+	if (/shortcut to Toggle FullScreen/) {
+		$on = 1;
+		next;
+	}
+	next unless $on;
+	next if /^\s+$/;
+
+	if (/^        -/) {
+		print ".TP\n";
+		$_ =~ s/(-\w+)( n)?\s+/$1$2\n/;
+	}
+	$_ =~ s/(-\w+)/\\fB\\$1\\fR/g;
+	$_ =~ s/^\s*//;
+	print $_;
+	$on = 0 if /New Popup actions:/;
+}

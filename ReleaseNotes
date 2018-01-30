@@ -1,0 +1,560 @@
+----------------------------------------------------------------------------
+New in the 1.0.29 SSVNC release:
+
+	The lim_accept.so preloading is tested before running ssh, and
+		the feature is disabled if it fails to load.  This is
+		currently required on MacOSX with 64-bit ssh binary.
+
+	How to provide a wrapper script (SSH env. var.) to launch your
+		own custom ssh is now documented.  One can use this to
+		supply additional arguments to ssh (e.g. -a or -Snone)
+		One can also specify the setting in ~/.ssvncrc
+
+	The ssvncviewer can be accessed by using 'ssvnc -viewer ...'
+		instead of 'ssvnc -cmd -viewer ...'  This is used to
+		launch the ssvncviewer binary and not the SSVNC gui.
+
+
+  miscellaneous new features and changes:
+
+	The piped process started for via exec="cmd ..." is now waited
+		for 1.5 seconds at exit.  It is sent SIGTERM if it has
+		not exited by then.  Set SSVNC_NO_KILL_EXEC_CMD=1 to
+		prevent sending this kill signal.
+
+	One can force interpretation as a Unix socket via the command line
+		operand unix=/path/to/unix/socket  (the unix= is optional
+		if the file exists, but use of unix= is preferred.)
+
+	An environment variable SSVNC_EXTRA_COMMAND can be supplied to
+		indicate an extra command to run in the background right
+		before starting the vncviewer.
+
+	The env. var. SSVNC_ONCE_ONLY makes it so the gui exits after
+		the first connection ends.
+
+	The vnc server name size is limited to 10000 bytes.
+
+	Setting SSVNC_XTERM_REPLACEMENT=' ' will disable showing any
+		terminal window with ssh, stunnel, or vncviewer running.
+		If any of those programs prompt from the terminal, you
+		will not be able to reply.  This is for people who do
+		not like to see the terminal.
+
+	A ReleaseNotes file is included in the distributed tarball.
+
+For more information: 
+
+	http://www.karlrunge.com/x11vnc/ssvnc.html
+
+----------------------------------------------------------------------------
+New in the 1.0.28 SSVNC release:
+
+	XGrabKeyboard() is now favored over XtGrabKeyboard().  This solves
+		some problems with full-screen mode on recent desktop
+		systems.  To regain the old behavior, set SSVNC_XTGRAB=1.
+
+
+	A deadlock bug is fixed with UltraVNC Single Click
+		when -acceptpopupsc is specified.  See
+		http://bugs.debian.org/592873  for an example.
+
+  miscellaneous new features and changes:
+
+	A proxy host may now be an IPV6 mapped IPV4 address, i.e.
+		::ffff:...
+
+For more information: 
+
+	http://www.karlrunge.com/x11vnc/ssvnc.html
+
+----------------------------------------------------------------------------
+New in the 1.0.27 SSVNC release:
+
+	The Unix and MacOSX VNC viewer binary (vncviewer and/or
+		ssvncviewer) now supports IPv6 natively (i.e. the
+		SSVNC GUI and helper tools are no longer needed for
+		IPv6 connections.)
+
+	The ultravnc_dsm_helper tool has been extended to fetching SSL
+		certificates with a 'showcert' action.	This is used by
+		SSVNC/ss_vncviewer as a replacement to the previous method
+		of fetching certificates by using 'openssl s_client'.
+		Override this with SSVNC_USE_S_CLIENT=1.
+
+		ultravnc_dsm_helper now also supports IPv6, so UltraVNC
+		DSM encrypted connections now work over IPv6.
+
+		ultravnc_dsm_helper now has a 'relay' action that enables
+		un-encrypted general TCP relaying (including IPv6.)
+
+	If the SSH username has a space in it (e.g. Windows) use %SPACE
+		to indicate it.  %TAB does a similar thing.
+
+	On Windows 'Putty Args', 'Putty Agent' and 'Putty Key-Gen'
+		actions have been added.
+
+
+  miscellaneous new features and changes:
+
+	In SSH x11vnc PORT= dynamic port determination mode (Terminal
+		Services too) if the interface is IPv6 only '::1' is
+		used instead of 'localhost'.
+
+	The -noipv4 and -noipv6 ssvncviewer options now work properly
+		and can be set via -xrm.
+
+	Stunnel's native IPv6 support is now used on Windows instead of
+		using the proxy helper.
+
+	UltraVNC repeater use with SSL is better documented and examples
+		for x11vnc are show.
+
+	Timing bugs with Listening mode when using a proxy (including
+		UltraVNC repeater) have been fixed.
+
+	You can set any environment variable inside the GUI by putting
+		ENV=VAR=VAL in the display entry box.
+
+	The massive list of environment variables that apply to the
+		ss_vncviewer wrapper script and ssvncviewer binary
+		(both only for unix and mascox) that can be found in
+		Options -> Advanced -> Unix ssvncviewer -> Help
+		are expanded and each one is documented.
+
+	SSVNC_PROFILE_LOADONLY env. var has been added to only load a
+		profile indicated in the cmdline instead of launching
+		it too.
+
+	On Windows in SSH mode it is OK to leave off the trailing ':0';
+		it is now added for you as it has always been on Unix.
+
+	On Windows CONNECT_BR_SLEEP env. var. has been added to delay
+		the start of the connect_br.tcl proxy helper.
+
+	PPROXY can act as a generic TCP rendezvous tool by setting
+		PPROXY_GENERIC_REPEATER.
+
+For more information: 
+
+	http://www.karlrunge.com/x11vnc/ssvnc.html
+
+----------------------------------------------------------------------------
+New in the 1.0.26 SSVNC release:
+
+	IPv6 support is provided for nearly all usage scenarios including
+		reverse and unencrypted connections on Unix, MacOSX,
+		and Windows.  This support also extends to the use of
+		3rd party VNC Viewers that do not support IPv6 (use:
+		Options -> Advanced -> 'Change VNC Viewer')
+
+		In addition to the ssh and stunnel native IPv6 support
+		(that has always been there and worked) the SSVNC wrapper
+		scripts and proxies were modified to support IPv6 as well.
+		Note, however, the system where SSVNC is run must still
+		support IPv4 for at least the loopback device (this will
+		be relaxed in a later release.)
+
+		Also note, on Windows, Plink does not work with numerical
+		IPv6 addresses, but does work with IPv6 hostnames.
+		On Unix and MacOSX the perl IO::Socket::INET6 module may
+		be needed for IPv6 support with some of the proxy modes.
+
+
+	On Unix and MacOSX some special proxy modes (e.g. VeNCrypt)
+		will now loop indefinitely in reverse-connection mode,
+		instead of only running once (that would require the user
+		to restart the listening viewer after each connection.)
+
+
+	For reverse (listening) connections one can now specify a single
+		network interface to listen on e.g. 192.168.1.100:0 in
+		'VNC Host:Display'.  The STUNNEL_LISTEN env. var. can
+		also indicate the interface to listen on.
+
+
+	The 'Tips' section in the main Help panel now has a table of
+		contents.
+
+
+  miscellaneous new features and changes:
+
+	On Windows the settings SSVNC_NO_DELETE and SSVNC_BAT_SLEEP aid
+		troubleshooting connections by not deleting Plink batch
+		files and sleeping a specified number of seconds before
+		exiting a batch script.
+
+	On Unix and MacOSX the Tight Security Type can be disabled by
+		setting the env. var. VNCVIEWER_NO_SEC_TYPE_TIGHT.
+
+	If SSH is not active and a hostname or proxy has a '@' in it,
+		the user is warned before proceeding (user likely meant
+		to enable SSH mode.)
+
+	It is made clearer that 'Multiple Listen' mode (simultaneous
+		reverse connections) is the default and only mode possible
+		on Windows.  On Unix and MacOSX the user has the option
+		to select that mode in the GUI.
+
+	It is documented that VeNCrypt and/or an IPv6 channel are treated
+		proxies, and so may use up one of the three allowed in
+		a proxy chain.
+
+	Many gcc warnings in the Unix and MacOSX ssvncviewer have been
+		cleaned up.
+
+
+For more information: 
+
+	http://www.karlrunge.com/x11vnc/ssvnc.html
+
+----------------------------------------------------------------------------
+New in the 1.0.25 SSVNC release:
+
+	VNC Server SSL keys signed by a Certificate Authority (i.e. not
+		self-signed) are detected and handled better by informing
+		the user of the situation and what they need to do to
+		authenticate the server.
+
+	The UltraVNC RSA-based encryption plugin 'SecureVNC' is supported.
+
+	The 'No Encryption' option is shown by default.
+
+	Warnings are printed out when there is any chance of a
+		man-in-the-middle attack on a SSH or stunnel SSL
+		connection.  A per-profile knownhosts file is provided
+		on Unix to avoid any man-in-the-middle possibility for
+		chained SSH tunnels and similar proxy schemes.	It can be
+		set via the gui or by the SSVNC_KNOWN_HOSTS_FILE env. var.
+
+	A connection profile can be assigned a fixed "Port Slot" on
+		Windows to avoid port collisions and other problems.
+		It also allows Putty to store the host keys for localhost
+		tunnels more effectively because Putty uses host:port as
+		the identifier instead of only host (see the per-profile
+		knownhosts file feature on unix mentioned above.)
+
+	On unix, the included ssvncviewer viewer now has an "-appshare"
+		option to go along with x11vnc 0.9.9's appshare
+		multiple-window, reverse connection-based application
+		sharing mechanism.  See "x11vnc -appshare -help" for
+		more info.  Escape Keys have been extended to provide
+		extra actions for the -appshare mode.
+
+		From the GUI, one can enable this mode by specifying a
+		reverse connection and setting "-appshare" in the Unix
+		ssvncviewer Options 'Extra Options' entry box:
+		Options -> Advanced -> Unix ssvncserver -> Extra Options.
+		A way from the cmdline is: ssvnc -cmd -viewer -appshare
+
+	The gui now handles short screens (< 700 pixels tall) better.
+
+
+  miscellaneous new features and changes:
+
+	The command line utility "ssvnc_cmd" on unix can now launch the
+		ssvncviewer directly: ssvnc_cmd -viewer <viewer-args>
+		E.g.:  ssvnc_cmd -viewer snoopy:0
+		If ssvnc_cmd is not available in PATH, it can be accessed
+		with: ssvnc -cmd <ssvnc_cmd-args>
+		E.g.:  ssvnc -cmd -viewer snoopy:0
+
+	A 'Do not Probe for VeNCrypt' option is provided.
+
+	The Fetch Cert action now has a timeout on unix.  The
+		default is 15 seconds can it can be set via the
+		SSVNC_FETCH_TIMEOUT=secs env var.
+
+	A terminal program used to run interactive commands
+		(ssh, vncviewer, or stunnel) can be set in
+		SSVNC_XTERM_REPLACEMENT to be something besides the default
+		xterm.	The command or wrapper must support the -e option.
+
+	The user may adjust the pause delay before the terminal
+		exits via the SSVNC_FINISH_SLEEP=secs env var.
+		The SSVNC_MESG_DELAY=msecs env var. can be set to adjust
+		the delay between status-bar messages.
+
+	Shared memory resources are now properly released when the screen
+		is resized.
+
+	The unix viewer attempts to preserve its center-of-mass location
+		after a resize.
+
+	Some rare case pixel-mask painting errors have been fixed.
+
+
+For more information: 
+
+	http://www.karlrunge.com/x11vnc/ssvnc.html
+
+----------------------------------------------------------------------------
+New in the 1.0.24 SSVNC release:
+
+	VeNCrypt and ANONTLS SSL encryption is now supported on all
+		platforms including Windows.  Additionally, the SSVNC
+		VeNCrypt bridge enables VeNCrypt and ANONTLS encryption
+		for *any* third party VNC Viewer on Unix, Mac OS X,
+		and Windows (Options -> Advanced -> Change VNC Viewer.)
+
+	On Unix and Mac OS X reverse (viewer listening) VNC connections
+		can show a Popup dialog asking whether to accept the
+		connection or not. The extra info provided by UltraVNC
+		Single Click reverse connections is also supported.
+
+	Different fonts and sizes may be set for the SSVNC encryption GUI
+		via ~/.ssvncrc or environment variable.
+
+	Global default values of settings for the encryption GUI may be
+		set by saving them to the profile named "defaults".
+
+	The drawing performance of the Hextile encoding has been improved
+		and the use of it can now be toggled in the Popup menu.
+
+  miscellaneous new features and changes:
+
+	Wrapper scripts check for missing utilities, and prints out a
+		warning message that a package containing it needs to
+		be installed.
+
+	The reliability of the VeNCrypt or ANONTLS protocol automatic
+		detection has been improved.  The usage mode is better
+		documented.
+
+	One can instruct the Unix ssvncviewer to not use the terminal
+		window it is running in for prompting (i.e. popup windows
+		are used instead.)
+
+	Pipelined Updates can now be disabled in the GUI.  Any extra
+		options to the Unix ssvncviewer can be specified in
+		the GUI.  Commas can be used to separate encoding types
+		in addition to spaces.
+
+	The 'SSH Local Port Protections' connect time limit has been
+		increased from 15 to 35 seconds.
+
+
+For more information: 
+
+	http://www.karlrunge.com/x11vnc/ssvnc.html
+
+----------------------------------------------------------------------------
+Release Name: 1.0.23
+
+Notes:
+ 
+New in the 1.0.23 SSVNC release:
+
+        Support for VirtualGL's TurboVNC (an enhanced TightVNC for fast,
+                high framerate usage) encoding and TightVNC modifications.
+                Binaries for Linux and MacOSX on i386 and amd64 are
+                provided in the bundle.  You will also need to download
+                and install the TurboJPEG package separately.
+
+        Outside of TurboVNC mode, TurboVNC's 'Pipelined Updates' idea is
+                implemented and is on by default. Disable via -nopipeline.
+
+        The UltraVNC MS-Logon authentication method is supported (see
+                http://www.uvnc.com/features/authentication.html).
+                Please use an SSH, SSL, or otherwise encrypted tunnel
+                when using UltraVNC MS-Logon over an untrusted network.
+
+        TightVNC compression and quality levels are now automatically
+                determined by measuring the network latency (not the
+                network bandwidth) to the VNC server.  If this causes
+                undesirable settings, you will need to specify them
+                manually.
+
+  miscellaneous new features and changes:
+
+        The -sendclipboard option allows one to send the CLIPBOARD selection
+                to the VNC Server instead of the default PRIMARY selection.
+
+        The -sendalways option indicates to send the selection text every
+                time the mouse focus enters the VNC viewer instead of only
+                when the selection has appeared to have changed.
+
+        The -recvtext option lets one set which of the CLIPBOARD and
+                PRIMARY selections are set when receiving 'cut text' from
+                the VNC server.  The default now is "both".
+
+        There are X resources, SendClipboard, SendAlways, and RecvText
+                for the above three selection-oriented options, and
+                EscapeKeys too.  SendClipboard and SendAlways are also
+                in the Popup menu.
+
+        Most messages will now go to a popup window if the stdio is not
+                connected to a terminal. Disable with SSVNC_NO_MESSAGE_POPUP.
+
+        OpenSSL for stunnel and ultravnc_dsm_helper in the SSVNC binary
+                bundles have been updated to the latest version to avoid
+                a possible vulnerability.  Windows OpenSSL exes and dlls
+                have also be updated to the latest version.
+
+        A bug has been fixed when one sets the -scale option to an invalid
+                scaling string.
+
+
+For more information: 
+
+        http://www.karlrunge.com/x11vnc/ssvnc.html
+
+
+----------------------------------------------------------------------------
+Release Name: 1.0.22
+
+Notes:
+    
+New in the 1.0.22 SSVNC release:
+
+        SSVNC's SSL encryption is extended to support the VeNCrypt and
+                TLS (older; vino) SSL/TLS security type extensions to VNC.
+                These modes work for both forward and reverse connections.
+
+        SSL Certificate Revocation Lists are supported.
+
+        In regular SSL mode (i.e. vncs://) Anonymous Diffie Hellman
+                (encryption but no certificate authentication) is now
+                supported.
+
+        The CUPS print tunnelling is now much improved; the default
+                settings should work for most setups (let us know if
+                it doesn't.)
+
+        The Windows helper programs are updated to most recent versions.
+                Updated stunnel source to version 4.26 for Unix.
+
+
+  miscellaneous new features and changes:
+
+        Default certificates and keys can be set via the command
+                line -mycert, -cacert, and -crl or their ~/.ssvncrc
+                equivalents.
+
+        The -unixpw username+password mode can be used with the VeNCrypt
+                *Plain authentication methods.
+
+        On MacOS X, the supplied enhanced Unix X11 vncviewer is now the
+                default instead of Chicken of the VNC.  See SSVNC_COTVNC.
+                and cotvnc=1 ~/.ssvncrc settings.
+
+        On Windows killstunnel mode is now the default.
+
+        On Unix/MacOSX SSH Local Port Protections is now on by default.
+
+        When client-side scaling is enabled, the VNC encoding is switched
+                from TightVNC to ZRLE because the latter is much faster
+                (~4X) because it draws less to the viewer screen.
+
+        Documentation warns about existing Man-In-The-Middle tools
+                like dsniff/webmitm and cain.  Stunnel messages are
+                documented better.
+
+        One can now specify a single reverse connection with the 'Listen
+                Once' option.  For Unix/MacOSX only.
+
+        Improved ssh pid detection for ss_vncviewer wrapper.
+
+        It is possible, but still awkward, to Fetch a Cert in Reverse
+                connection mode (server must do an connect and reconnect).
+                For Unix/MacOSX only.
+
+        On MacOS X '127.0.0.1' is used instead of 'localhost' to work
+                around problems where it is not resolved.
+
+        Support for RFB 3.8 protocol.
+
+
+For more information:
+
+        http://www.karlrunge.com/x11vnc/ssvnc.html
+
+----------------------------------------------------------------------------
+Release Name: 1.0.21
+
+Notes:
+  
+New in the 1.0.21 SSVNC release:
+
+        The Unix and MacOSX X11 SSVNC viewer now can do client-side
+                scaling of the desktop.
+
+        Zeroconf (aka Bonjour, Avahi, mDNS) can be used on Unix and
+                MacOSX to locate nearby VNC servers ('Find' button).
+
+        The 'Escape Keys' mechanism enables many of the Popup Menu actions
+                to be performed via hot-keys (Unix and MacOSX X11 only).
+
+        For the SSVNC gui (on all platforms) it is now easier to disable
+                encryption with the added a 'No Encryption' button
+                (-noenc cmdline option.)  Additional documentation on
+                disabling encryption was added.
+
+        The '-chatonly' option enables x11vnc to display an UltraVNC
+                chat window on the local X11 display (the ssvnc command
+                must be in PATH).
+
+        The Unix and MacOSX X11 SSVNC viewer now does the STUNNEL EXEC
+                local port protection mechanism by default.
+
+
+  miscellaneous new features and changes:
+
+        The convential source build has been modified to install a
+                ssvnc.desktop entry, allow installation into a staging
+                area, and additional controls.  The ssvncviewer binary
+                is now installed to bin by default.
+
+        On Windows there is a 'Kill Stunnel Automatically' button to
+                not prompt you whether to terminate stunnel or not.
+
+        A new Popup dialog 'Unix ssvncviewer' is provided to allow more
+                control of the provided SSVNC Unix and MacOSX X11 viewer.
+
+        The UltraVNC filetransfer Java helper (Unix and MacOSX) now
+                handles ISO-8859-1 and UTF-8 filename characters better.
+                Filetransfer now works when running 'ssvncviewer'
+                without using the SSVNC GUI wrapper.
+
+        Many of the SSVNC vncviewer options can be set via new cmdline
+                options for the ss_vncviewer wrapper.
+
+        The huge main Help panel has been split into 4 topics.
+
+        Some font size problems with tk8.5 and debian/ubuntu are now
+                worked around.
+
+For more information:
+
+        http://www.karlrunge.com/x11vnc/ssvnc.html
+
+----------------------------------------------------------------------------
+Release Name: 1.0.20
+
+Notes: This release supports the UltraVNC repeater proxy and Single
+Click connection modes. SOCKS proxies and proxy chaining now work on
+Windows. UltraVNC file transfer is much improved. UltraVNC DSM encryption
+and general symmetric encryption modes are supported. Local machine
+port protection mechanisms are provided. A new option selects the X11
+VNC Viewer on Mac OS X. The ZYWRLE encoding (a wavelet based extension
+to ZRLE) was added. The Unix Viewer's popup window is split into two
+columns and includes new actions.
+
+----------------------------------------------------------------------------
+Release Name: 1.0.19
+
+Notes: Two new GUI modes are introduced: SSH-only (sshvnc) and
+Terminal-Services (tsvnc). The SSH-only mode does not show any SSL
+related options, and so is less distracting if you never plan on using
+SSL. The Terminal-Services mode is also SSH-only, and it assumes that
+x11vnc 0.9.3 or later is available on the remote computer. With this
+assumption, it can do a number of convenient things such as automatically
+find your desktop session, create a desktop session if one is not found,
+set the session type (KDE, GNOME, etc.), size, and color depth, enable
+remote CUPS printing, VNC file transfer, etc.
+
+----------------------------------------------------------------------------
+Release Name: 1.0.18
+
+Notes: The Unix VNC Viewer now supports UltraVNC file transfer via an
+auxiliary Java program.

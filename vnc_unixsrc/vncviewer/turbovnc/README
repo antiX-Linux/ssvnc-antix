@@ -1,0 +1,38 @@
+
+To build with TurboVNC support:
+
+	http://www.virtualgl.org/About/TurboVNC
+
+first download and unpack/install the TurboJPEG package:
+
+	http://sourceforge.net/project/showfiles.php?group_id=117509&package_id=166100
+
+Then build via something like this:
+
+	make CCOPTIONS=-DTURBOVNC EXTRA_LIBRARIES='-L/home/runge/turbojpeg -Xlinker --rpath=/home/runge/turbojpeg -lturbojpeg'
+
+where you replace /home/runge/turbojpeg with the directory containing
+libturbojpeg.so you unpacked/installed.
+
+You don't need the --rpath if you installed libturbojpeg.so to a standard
+location (e.g. /usr/lib) or you set LD_LIBRARY_PATH to point the the
+correct directory at runtime.
+
+That command would be used with the ssvnc source tarball.  To use the
+build.unix script do:
+
+	env TURBOVNC="$EXTRA_LIBRARIES" ./build.unix
+
+where EXTRA_LIBRARIES is as above.
+
+The source files in this directory are from the VirtualGL TurboVNC
+code base.
+
+Note that the binary created will only support TurboVNC's tight vnc
+implementation, and not the default TightVNC one.
+
+Note that the x11vnc server also supports TurboVNC:
+
+	http://www.karlrunge.com/x11vnc/faq.html#faq-turbovnc
+
+The current TurboVNC support is experimental.  Please report any bugs.

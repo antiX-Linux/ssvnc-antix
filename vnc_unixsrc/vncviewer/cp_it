@@ -1,0 +1,18 @@
+#!/bin/sh
+
+dest=/dist/bin/vncviewerz-1.3dev5-resize
+suc "cp -p $dest $dest.back; mv $dest $dest.unlink; mv $dest.back $dest; rm $dest.unlink"
+strip ./vncviewer
+cat   ./vncviewer > $dest
+touch -r ./vncviewer $dest 
+yy=/dist/src/apps/VNC/etc/libvncserver_cvs/expts/etv/ssvnc/bin/Linux.i686/vncviewer
+mv $yy $yy.unlink
+cp -p ./vncviewer $yy
+mv $yy.turbovnc $yy.unlink.turbovnc
+cp -p ./vncviewer $HOME/etv_col/Linux.i686
+cp -p ./vncviewer.turbovnc $yy.turbovnc
+cp -p ./vncviewer.turbovnc $HOME/etv_col/Linux.i686/vncviewer.turbovnc
+chmod 755 $yy*
+
+rm -f $yy.unlink*
+ls -l ./vncviewer* $dest $yy* $HOME/etv_col/Linux.i686/vncviewer*

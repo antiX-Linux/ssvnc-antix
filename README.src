@@ -1,0 +1,343 @@
+
+The tarball ssvnc-x.y.z.src.tar.gz contains a source only distribution
+of SSVNC (GUI scripts, Unix vncviewer, and java filetransfer helper)
+for unix.
+
+This source distribution should be more convenient for software
+distributors, e.g. distro maintainers.  It will also be useful
+for sysadmins (or others) who do not want to use the pre-built,
+"one-tarball-fits-all" SSVNC bundles.
+
+QUICK START:
+-----------
+
+For those in a rush who do not want to read the details below:
+
+	tar xzf ssvnc-x.y.z.src.tar.gz
+	cd ssvnc-x.y.z
+	make config
+	make all
+	make PREFIX=/usr/local install
+
+then run ssvnc, ssvncviewer, read manpages etc.
+
+PREFIX is set to the destination install directory.  root permission
+(e.g. sudo) may be needed to install into /usr/local, /usr, etc.
+
+To skip the Java applet jar for the ultravnc filetransfer helper set
+JSRC to the null string:
+
+	make JSRC="" ...
+
+for all of the make commands.
+
+
+UNPACKING:
+---------
+
+It will unpack to a directory named ssvnc-x.y.z
+
+	tar xzf ssvnc-x.y.z.src.tar.gz
+	cd ssvnc-x.y.z
+
+
+BUILDING:
+--------
+
+Inside that directory, ssvnc-x.y.z, typing 'make' will configure the
+build.  (equivalent to 'make config'.)
+
+	make config
+
+The Imake (xmkmf command) system must be installed for the config
+to work.  Also, the javac and jar commands must be available (version
+1.4 or later) on the build machine.
+
+If the xmkmf ('make') succeeded, one can next run 'make all' to build
+the Unix vncviewer and UltraVNC filetransfer helper java program.
+This also builds the vncstorepw password helper utility.
+
+	make all
+
+GNU make is required for making the java helper program.
+
+See DEPENDENCIES below for more information.
+
+
+LIBRARY LOCATIONS:
+-----------------
+
+If some libraries are in non-standard locations (i.e. not /usr/lib and
+/usr/include and other ones picked up by default); even though it is a
+bit awkward one can do something like the following via environment
+variables.
+
+Suppose libjpeg was located in directory /usr/place1, and libz was in
+/usr/place2, and libssl/libcrpyto was in /usr/place3. Also suppose we
+want the package installed into /usr/dest1.  This build script should
+work in general (customize to your environment and OS, linker, etc):
+
+#!/bin/sh
+#
+# Build script for ssvnc source tarball that sets jpeg, zlib, and ssl
+# library locations.
+
+JPEG_INC='-I/usr/place1/include'
+JPEG_LIB='-L/usr/place1/lib -lz'
+
+ZLIB_INC='-I/usr/place2/include'
+ZLIB_LIB='-L/usr/place2/lib -lz'
+
+CPP_SSL='-I/usr/place3/include'
+LD_SSL='-L/usr/place3/lib'
+
+PREFIX=/usr/dest1
+
+export JPEG_INC JPEG_LIB ZLIB_INC ZLIB_LIB CPP_SSL LD_SSL
+
+# To build on Solaris 10 with gcc uncomment the two lines below
+# and use 'gmake' instead of 'make' below.
+#
+#CC=gcc;       export CC
+#CCOPTIONS=''; export CCOPTIONS
+
+make -e config
+make -e all
+make -e PREFIX=$PREFIX install
+
+exit
+
+
+Here is a 1-liner for Solaris 10 (assumes libjpeg in /usr/local):
+
+	env PATH=/usr/ccs/bin:/usr/sfw/bin:$PATH CC=gcc CCOPTIONS='' CPP_SSL='-I/usr/sfw/include' LD_SSL='-L/usr/sfw/lib' gmake -e config all
+
+
+TURBOVNC/TURBOJPEG:
+------------------
+
+To build with the turbovnc/turbojpeg support described here:
+
+	http://www.virtualgl.org/
+
+you can do something like this:
+
+make config
+make EXTRA_LDOPTIONS='-L/some/place/turbojpeg -Xlinker --rpath=/some/place/turbojpeg -lturbojpeg' CCOPTIONS=-DTURBOVNC all
+make PREFIX=/other/place install
+
+This requires that you download the libturbojpeg.so library:
+
+	http://sourceforge.net/project/showfiles.php?group_id=117509&package_id=166100
+
+and refer to the directory you put it in the EXTRA_LDOPTIONS.
+
+
+INSTALLING:
+----------
+
+If the 'make all' succeeded, one can next do a make install.
+
+The default install location is /usr/local.  See PREFIX in Makefile.
+
+	make install
+or
+	make PREFIX=/my/place install
+
+These files will be installed:
+
+  -rwxr-xr-x       79 /usr/local/bin/ssvnc
+  -rwxr-xr-x       79 /usr/local/bin/tsvnc
+  -rwxr-xr-x       80 /usr/local/bin/sshvnc
+  -rwxr-xr-x   202304 /usr/local/bin/ssvncviewer
+  -rwxr-xr-x   202304 /usr/local/lib/ssvnc/vncviewer
+  -rwxr-xr-x     8404 /usr/local/lib/ssvnc/vncstorepw
+  -rwxr-xr-x     7659 /usr/local/lib/ssvnc/unwrap.so
+  -rwxr-xr-x     4499 /usr/local/lib/ssvnc/lim_accept.so
+  -rwxr-xr-x    14256 /usr/local/lib/ssvnc/ultravnc_dsm_helper
+  -rwxr-xr-x      145 /usr/local/lib/ssvnc/sshvnc
+  -rwxr-xr-x     2906 /usr/local/lib/ssvnc/ssvnc
+  -rwxr-xr-x     6137 /usr/local/lib/ssvnc/ssvnc_cmd
+  -rwxr-xr-x      141 /usr/local/lib/ssvnc/tsvnc
+  -rw-r--r--     1146 /usr/local/lib/ssvnc/util/stunnel-server.conf
+  -rwxr-xr-x    42477 /usr/local/lib/ssvnc/util/ss_vncviewer
+  -rwxr-xr-x   343235 /usr/local/lib/ssvnc/util/ssvnc.tcl
+  -rwxr-xr-x    98755 /usr/local/lib/ssvnc/util/ultraftp.jar
+  -rw-r--r--     5192 /usr/local/man/man1/ssvnc.1
+  -rw-r--r--    27149 /usr/local/man/man1/ssvncviewer.1
+
+The commands 'ssvnc', 'tsvnc', 'sshvnc', and 'ssvncviewer' should now
+be in the user's $PATH.
+
+All the helper utilities (not expected to be run directly by a user) are
+down in $PREFIX/lib/ssvnc
+
+To change the destination set the PREFIX=/path on the make cmd line, e.g.:
+
+	make PREFIX=$HOME/SSVNC install
+	make PREFIX=/tmp/ssvnc  install
+	make PREFIX=/usr install
+
+Include MANDIR=share/man to install the man pages into
+$(PREFIX)/share/man instead of simply $(PREFIX)/man
+
+This 'ssvncviewer' binary installed in bin is a peer to ones like
+'xtightvncviewer', 'xvncviewer', etc. that one often finds Linux distro
+packages for.  'ssvncviewer' is an enhanced version with useful features.
+
+The user can run this for more information:
+
+	ssvncviewer -help
+
+Set BINNAME to the empty string to skip installing ssvncviewer; so as
+to only install the ssvnc GUI programs in bin.  E.g.
+
+	make BINAME="" PREFIX=/usr install
+
+
+A Desktop Entry is installed into share/applications/ssvnc.desktop.
+
+Set APPS to the empty string to skip installing ssvnc.desktop, e.g..
+
+	make APPS="" PREFIX=/usr install
+
+
+INSTALLING TO A ROOT/STAGING AREA:
+---------------------------------
+
+Set ROOT to a staging area directory for an install that thinks
+it is installed in $(PREFIX) but is really in $(ROOT)$(PREFIX).
+
+	make ROOT=/tmp/stage1 PREFIX=/usr install
+
+will give a /usr based install in /tmp/stage1/usr/...
+
+
+DEPENDENCIES:
+------------
+
+SSVNC is a nice hack, it glues together a number of programs and scripts
+to make something fairly useful.  However, because of this it has a lot
+of dependencies; many of them unexpected.
+
+
+Build-time dependencies:
+-----------------------
+
+  We mentioned these above: xmkmf, javac, jar (sun java 1.4 or later).
+
+  A basic X11 build environment and libraries is needed:
+
+    libXaw
+    libXmu
+    libXt
+    libSM
+    libICE
+    libXpm
+    libXext
+    libX11
+
+  as well as these compression libraries:
+
+    libjpeg
+    libz
+
+  For the ultravnc_dsm_helper these are needed:
+
+    libcrypto
+
+  Of course gcc/cc and make.  Also strip(1).
+
+
+Run-time dependencies:
+---------------------
+
+The most important one is:
+
+  stunnel
+
+unlike the SSVNC bundles, stunnel is not included and the system one
+(version 4.x) must be installed.
+
+Note that since stunnel is typically installed into /usr/sbin instead
+of /usr/bin, the SSVNC wrapper script takes this into account and tries
+to extend $PATH to be able to find it.
+
+
+Main run-time dependencies:
+-------------------------
+
+  tcl/tk   (wish)
+  perl
+  xterm
+  ssh
+  openssl  (the command, not library)
+  java     (sun java 1.4 or later (not gcj), for ultravnc filexfer)
+
+  See the X11 libraries in the build list above.
+
+  libjpeg
+  libz
+
+  For the ultravnc_dsm_helper these are needed:
+
+  libcrypto
+
+
+
+Misc Unix utility dependencies:
+------------------------------
+
+  host
+  hostname
+  nc
+  netstat 
+  ps
+  smbclient
+  stty
+  uname
+
+For Zeroconf listings one of:
+----------------------------
+
+  avahi-browse
+  dns-sd
+  mDNS
+
+Unix shell utilities dependencies:
+---------------------------------
+
+  awk
+  cat
+  chmod
+  date
+  dirname
+  egrep
+  expr
+  grep
+  head
+  kill
+  killall
+  ls
+  mknod
+  mktemp
+  printf
+  rm
+  sed
+  sleep
+  sum
+  tail
+  touch
+  tr
+  uniq
+  wc
+  whoami
+
+There may be some that have been missed (let us know if you find any).
+
+Note that to have the primary functionality not all of the dependencies
+need to be met.  For example, java is only needed for the UltraVNC
+filetransfer.  smbclient is only used if they try to mount their SMB
+shares on the remote side.
+
+The wrapper scripts will often try to cope if a utility is not present.

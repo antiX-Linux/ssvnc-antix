@@ -1,0 +1,36 @@
+Description: Improve handling of -h[e[l[p]]]
+ Catches -he and -hel as well, instead of letting wish print its usage 
+ message (that sounds like an error message).
+Author: Magnus Holmgren <holmgren@debian.org>
+Bug-Debian: http://bugs.debian.org/544250
+
+--- a/scripts/ssvnc
++++ b/scripts/ssvnc
+@@ -8,7 +8,8 @@
+ #
+ # See ssvnc_cmd for details.
+ #
+-if [ "X$1" = "X-help" -o "X$1" = "X-h" ]; then
++helpflag="-help"
++if [ ${#1} -gt 1 -a "$1${helpflag##$1}" = $helpflag ]; then
+ 	cat << END
+ ssvnc - a GUI wrapper for SSL and SSH VNC connections.
+ 
+@@ -111,7 +112,7 @@ END
+ 	exit 0
+ fi
+ if [ "X$1" = "X-ssh" ]; then
+-	if [ "X$2" = "X-help" -o "X$2" = "X-h" ]; then
++	if [ ${#2} -gt 1 -a "$2${helpflag##$2}" = $helpflag ]; then
+ 		cat << END
+ sshvnc - a GUI wrapper for SSH VNC connections.
+ 
+@@ -129,7 +130,7 @@ END
+ fi
+ 
+ if [ "X$1" = "X-ts" -o "X$1" = "X-tso" ]; then
+-	if [ "X$2" = "X-help" -o "X$2" = "X-h" ]; then
++	if [ ${#2} -gt 1 -a "$2${helpflag##$2}" = $helpflag ]; then
+ 		cat << END
+ tsvnc - a GUI wrapper for SSH VNC connections using x11vnc Terminal Services.
+ 

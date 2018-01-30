@@ -1,0 +1,32 @@
+Author: Magnus Holmgren <holmgren@debian.org>
+Description: Pass CFLAGS and LDFLAGS to xmkmf-generated Makefiles
+ Pass CFLAGS and LDFLAGS through via ./Makefile as
+ CDEBUGFLAGS and LOCAL_LDFLAGS to vnc_unixsrc/*/Makefile
+
+--- a/Makefile
++++ b/Makefile
+@@ -53,10 +53,10 @@ config:
+ 	@echo Now run: "'make all'"
+ 
+ all:
+-	cd $(VSRC)/libvncauth; $(MAKE)
+-	cd $(VSRC)/vncviewer;  $(MAKE)
++	cd $(VSRC)/libvncauth; $(MAKE) EXTRA_DEFINES="$(CPPFLAGS)" CDEBUGFLAGS="$(CFLAGS)" LOCAL_LDFLAGS="$(LDFLAGS)"
++	cd $(VSRC)/vncviewer;  $(MAKE) EXTRA_DEFINES="$(CPPFLAGS)" CDEBUGFLAGS="$(CFLAGS)" LOCAL_LDFLAGS="$(LDFLAGS)"
+ 	if [ "X$(JSRC)" != "X" ]; then cd $(JSRC); $(MAKE); fi
+-	cd $(PSRC); $(MAKE)
++	cd $(PSRC); $(MAKE) CPPFLAGS="$(CPPFLAGS)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)"
+ 
+ clean:
+ 	cd $(VSRC)/libvncauth; $(MAKE) clean
+--- a/vncstorepw/Makefile
++++ b/vncstorepw/Makefile
+@@ -8,7 +8,7 @@ LIMACC = lim_accept.so
+ ULTDSM = ultravnc_dsm_helper
+ 
+ # gcc must be used:
+-CC = gcc
++CC = gcc $(CPPFLAGS) $(CFLAGS) $(LDFLAGS)
+ 
+ all: $(CMD) $(UNWRAP) $(LIMACC) $(ULTDSM)
+ 

@@ -1,0 +1,109 @@
+ssvnc (1.0.29-3.1) unstable; urgency=medium
+
+  * fix desktop for antiX
+  * remove xterm dependency
+
+ -- anticapitalista <antix@operamail.com>  Mon, 29 Jan 2018 19:50:43 +0200
+
+ssvnc (1.0.29-3) unstable; urgency=low
+
+  * debian/rules: Add call to dh_strip_nondeterminism.
+  * openssl1.1.patch (new): Support OpenSSL 1.1 API changes (Closes:
+    #828559).
+  * auto-scale.patch (new): Make autoscaling work (Closes: #801804, LP:
+    #1312966). In addition to the command-line option "-scale auto"
+    creating a 1×1 window, rescaling when resizing the window didn't
+    happen, at least not when Caps Lock or other modifiers were active.
+  * samemachine_ipv6_overflow.patch (new): Fix stack overflow when
+    connecting over IPv6, caused by non-IPv6-aware code (Closes: #774622).
+  * nostrip.patch: Don't strip vncstorepw or ultravnc_dsm_helper either.
+  * buildflags.patch: Also pass flags to vncstorepw/Makefile and patch
+    that to use them.
+  * Bump Standards-Version to 3.9.8.
+
+ -- Magnus Holmgren <holmgren@debian.org>  Sat, 30 Jul 2016 23:09:44 +0200
+
+ssvnc (1.0.29-2) unstable; urgency=low
+
+  * Also get CPPFLAGS from dpkg-buildflags. Pass it as EXTRA_DEFINES to
+    vnc_unixsrc/*/Makefile.
+
+ -- Magnus Holmgren <holmgren@debian.org>  Fri, 11 Nov 2011 08:11:09 +0100
+
+ssvnc (1.0.29-1) unstable; urgency=low
+
+  * New upstream release.
+  * Install ReleaseNotes as upstream changelog file.
+  * Simply build-depend on libjpeg-dev instead of libjpeg62-dev |
+    libjpeg-dev (Closes: #644808).
+  * Install a symlink in /usr/bin instead of including the main vncviewer
+    binary twice in the package.
+  * Add build-arch and build-indep targets to debian/rules.
+  * nostrip.patch: Remove strip command from the Makefile, allowing
+    DEB_BUILD_OPTONS=nostrip to work.
+  * Get CFLAGS and LDFLAGS from dpkg-buildflags.
+  * buildflags.patch: Pass CFLAGS and LDFLAGS through via ./Makefile as
+    CDEBUGFLAGS and LOCAL_LDFLAGS to vnc_unixsrc/*/Makefile. This results
+    in -fno-strict-aliasing (added by xmkmf by default) being dropped, but
+    that doesn't seem to cause any problems.
+  * format-security.patch: Fix some flaws uncovered by -Wformat-security.
+  * Bump Standards-Version to 3.9.2.
+
+ -- Magnus Holmgren <holmgren@debian.org>  Thu, 10 Nov 2011 22:23:15 +0100
+
+ssvnc (1.0.28-1) unstable; urgency=low
+
+  * New upstream release (Closes: #592873, "Connection from UVNC
+    Single-Click does not start vncviewer when -acceptpopups is set").
+  * Convert to source format 3.0 (quilt), changing /bin/sh into /bin/bash
+    (see below) in the install target instead.
+  * debian/copyright: Update years of copyright; remove notice that the
+    UltraVNC DSM helper module is not included (which it is since
+    1.0.24-1).
+  * Remove redundant bash dependency; bash isn't going to be non-essential
+    any time soon.
+  * Up Standards-Version to 3.9.1.
+
+ -- Magnus Holmgren <holmgren@debian.org>  Sun, 06 Feb 2011 23:06:25 +0100
+
+ssvnc (1.0.27-1) unstable; urgency=low
+
+  * New upstream release.
+  * bashisms.dpatch: Don't try to fix all bashisms; instead change /bin/sh
+    to /bin/bash and depend on bash, which is small in this context.
+
+ -- Magnus Holmgren <holmgren@debian.org>  Sun, 23 May 2010 19:07:52 +0200
+
+ssvnc (1.0.25-1) unstable; urgency=low
+
+  * New upstream release.
+  * confusing_-h.dpatch and bashisms.dpatch: adjusted.
+
+ -- Magnus Holmgren <holmgren@debian.org>  Sat, 06 Feb 2010 20:45:04 +0100
+
+ssvnc (1.0.24-1) unstable; urgency=low
+
+  * New upstream release.
+    * ssvnc -help now prints a help message instead of passing -help to the
+      tcl interpreter.
+  * confusing_-h.dpatch (new): Improve upstream's handling of -help a bit
+    (Closes: 544250).
+  * ultraftp_path.dpach (new): Use hardcoded (and correct for this
+    package) path to ultraftp.jar if SSVNC_ULTRA_FTP_JAR is unset, so that
+    file transfers work even if ssvncviewer is executed directly.
+  * bashisms.dpatch (new): Fix most bashisms (all that matter).
+  * Drop no_openssl.dpatch and build ultravnc_dsm_helper; OpenSSL
+    exception has been granted. Build-depend on libssl-dev.
+  * Promote stunnel4 from Recommends to Depends (Closes: #553411), depend
+    directly on openssl, depend on tk instead of tk8.4, and tweak java
+    recommendations.
+  * Add README.source.
+  * Bump Standards-Version to 3.8.3.
+
+ -- Magnus Holmgren <holmgren@debian.org>  Sat, 31 Oct 2009 21:02:42 +0100
+
+ssvnc (1.0.23-1) unstable; urgency=low
+
+  * Initial release (Closes: #504134).
+
+ -- Magnus Holmgren <holmgren@debian.org>  Sat, 01 Aug 2009 19:31:25 +0200

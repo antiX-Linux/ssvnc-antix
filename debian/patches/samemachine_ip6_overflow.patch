@@ -1,0 +1,44 @@
+Description: Use a struct sockaddr_storage to retrieve local and peer addresses and compare according to address family.
+ Also check if -rawlocal was specified before even checking whether the remote machine is the local one.
+Bug-Debian: https://bugs.debian.org/774622
+
+--- a/vnc_unixsrc/vncviewer/sockets.c
++++ b/vnc_unixsrc/vncviewer/sockets.c
+@@ -1165,13 +1165,21 @@ char *ip2host(char *ip) {
+ Bool
+ SameMachine(int sock)
+ {
+-  struct sockaddr_in peeraddr, myaddr;
+-  int addrlen = sizeof(struct sockaddr_in);
++  struct sockaddr_storage peeraddr, myaddr;
++  int addrlen = sizeof(struct sockaddr_storage);
+ 
+   getpeername(sock, (struct sockaddr *)&peeraddr, &addrlen);
+   getsockname(sock, (struct sockaddr *)&myaddr, &addrlen);
+ 
+-  return (peeraddr.sin_addr.s_addr == myaddr.sin_addr.s_addr);
++  assert(((struct sockaddr*)&peeraddr)->sa_family == ((struct sockaddr*)&myaddr)->sa_family);
++  if (((struct sockaddr*)&myaddr)->sa_family == AF_INET6) {
++      return 0 == memcmp(&((struct sockaddr_in6*)&peeraddr)->sin6_addr.s6_addr,
++			 &((struct sockaddr_in6*)&myaddr)->sin6_addr.s6_addr,
++			 sizeof(struct in6_addr));
++  } else {
++      return ((struct sockaddr_in*)&peeraddr)->sin_addr.s_addr
++	  == ((struct sockaddr_in*)&myaddr)->sin_addr.s_addr;
++  }
+ }
+ 
+ 
+--- a/vnc_unixsrc/vncviewer/rfbproto.c
++++ b/vnc_unixsrc/vncviewer/rfbproto.c
+@@ -2204,8 +2204,8 @@ if (getenv("DEBUG_SETFORMAT")) {
+   } else {
+ 	/* DIFFERENT CASE */
+ 
+-    if (SameMachine(rfbsock)) {
+-      if (!tunnelSpecified && appData.useRawLocal) {
++    if (appData.useRawLocal && SameMachine(rfbsock)) {
++      if (!tunnelSpecified) {
+ 	fprintf(stderr,"Same machine: preferring raw encoding\n");
+ 	encs[se->nEncodings++] = Swap32IfLE(rfbEncodingRaw);
+       } else {
